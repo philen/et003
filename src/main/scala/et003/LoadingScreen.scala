@@ -17,7 +17,7 @@ class LoadingScreen extends UIScreen {
   val generator: FreeTypeFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("font/Crimson-Roman.ttf"))
   val parameter: FreeTypeFontGenerator.FreeTypeFontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter
   parameter.size = 150
-  parameter.characters = "Engi Test02"
+  parameter.characters = "Engi Test03"
   parameter.borderWidth = 0
   parameter.color = textColor
   parameter.shadowOffsetX = 5
