@@ -32,6 +32,9 @@ class LoadingScreen extends UIScreen {
   resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
   Gdx.graphics.setTitle("Engine Test 003")
 
+  val icosphere = Triangulation.triangulateIcoSphere(4)
+  print(icosphere.length)
+
   /** Called when this screen becomes the current screen. */
   def show(): Unit = {
   }
