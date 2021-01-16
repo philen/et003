@@ -1,9 +1,10 @@
 package et003
 
+import com.badlogic.gdx.math.Vector3
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class IcoSphereRegionSpec extends AnyFlatSpec with Matchers {
+class TriangulationSpec extends AnyFlatSpec with Matchers {
 
   def countTriangulation(t: Triangulation.Triangulation): Int = {
     t match {
@@ -21,5 +22,13 @@ class IcoSphereRegionSpec extends AnyFlatSpec with Matchers {
     for (depth <- 0 to 8) {
       assert(countIcoSphere(Triangulation.triangulateIcoSphere(depth)) == (20 * Math.pow(4, depth)))
     }
+  }
+
+  "stableMidpoint" should "return same result regardless of argument order" in {
+    val a = new Vector3(1f, 2f, 3f)
+    val b = new Vector3(4f, 5f, 6f)
+    assert(Triangulation.stableMidpoint(a, b).x == Triangulation.stableMidpoint(b, a).x)
+    assert(Triangulation.stableMidpoint(a, b).y == Triangulation.stableMidpoint(b, a).y)
+    assert(Triangulation.stableMidpoint(a, b).z == Triangulation.stableMidpoint(b, a).z)
   }
 }
