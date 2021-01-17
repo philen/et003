@@ -20,7 +20,7 @@ object Loader {
     appChannel.take.runAsync { result =>
       result match {
         case Left(err) => throw err
-        case Right(app) => app.postRunnable(() => ui.replace(new LoadingScreen()))
+        case Right(app) => app.postRunnable(() => ui.replace(new IcosphereScreen()))
     }}
 
     // TODO load from file in a Task

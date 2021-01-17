@@ -1,14 +1,18 @@
 package et003
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.{Color, GL20}
+import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.g3d.{Material, ModelInstance}
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.{Label, Table}
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 
 
-class LoadingScreen extends UIScreen {
+class IcosphereScreen extends UIScreen {
   private val backgroundColor = new Color(0x604087FF)
   private val textColor = new Color(0xDAA520FF)
   private val shadowColor = Color.DARK_GRAY
@@ -34,6 +38,27 @@ class LoadingScreen extends UIScreen {
 
   val icosphere = Triangulation.triangulateIcoSphere(4)
   print(icosphere.length)
+
+  private val modelBuilder = new ModelBuilder()
+  private val material = new Material()
+  modelBuilder.begin()
+  val builder = modelBuilder.part(
+    s"icosphere",
+    GL20.GL_TRIANGLES,
+    //      GL20.GL_LINES,   // wireframe
+    Usage.Position | Usage.ColorPacked | Usage.Normal,
+    material
+  )
+  for (triangle <- icosphere) {
+//    val c0 = Color.PURPLE
+//    val normal = new Vector3(triangle.centroid).nor()
+//    val i1 = builder.vertex(triangle.points.head, normal, c0, null)
+//    val i2 = builder.vertex(triangle.points(1), normal, c0, null)
+//    val i3 = builder.vertex(triangle.points(2), normal, c0, null)
+//    builder.triangle(i1, i2, i3)
+  }
+  new ModelInstance(modelBuilder.end())
+
 
   /** Called when this screen becomes the current screen. */
   def show(): Unit = {
