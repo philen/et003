@@ -52,7 +52,7 @@ object Triangulation {
   sealed trait Triangulation {
     def bounds: List[Vector3]
 
-    def triangles: List[Triangulation]
+    def triangles: List[Triangle]
   }
 
   case class Triangle(p1: Vector3, p2: Vector3, p3: Vector3)
@@ -73,9 +73,9 @@ object Triangulation {
                        c: Triangulation,
                        d: Triangulation)
     extends Triangulation {
-    def bounds = List(a.bounds.head)
+    def bounds = a.bounds
 
-    def triangles = List(a, b, c, d)
+    def triangles = a.triangles ++ b.triangles ++ c.triangles ++ d.triangles
   }
 
   def triangulateIcoSphere(depth: Int): Seq[Triangulation] = {

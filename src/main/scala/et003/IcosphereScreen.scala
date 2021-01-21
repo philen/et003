@@ -1,10 +1,12 @@
 package et003
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.{Color, GL20}
+import com.badlogic.gdx.graphics.{Camera, Color, GL20, PerspectiveCamera}
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.g3d.{Material, ModelInstance}
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
+import com.badlogic.gdx.graphics.g3d.{Environment, Material, ModelBatch, ModelInstance}
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -13,9 +15,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 
 
 class IcosphereScreen extends UIScreen {
-  private val backgroundColor = new Color(0x604087FF)
+  private val backgroundColor = Color.BLACK
   private val textColor = new Color(0xDAA520FF)
   private val shadowColor = Color.DARK_GRAY
+
+  private val modelBatch = new ModelBatch()
+
 
   // Generate FreeType fonts
   val generator: FreeTypeFontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("font/Crimson-Roman.ttf"))
@@ -36,7 +41,7 @@ class IcosphereScreen extends UIScreen {
   resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
   Gdx.graphics.setTitle("Engine Test 003")
 
-  val icosphere = Triangulation.triangulateIcoSphere(4)
+  val icosphere = Triangulation.triangulateIcoSphere(1)
   print(icosphere.length)
 
   private val modelBuilder = new ModelBuilder()
@@ -44,20 +49,33 @@ class IcosphereScreen extends UIScreen {
   modelBuilder.begin()
   val builder = modelBuilder.part(
     s"icosphere",
-    GL20.GL_TRIANGLES,
-    //      GL20.GL_LINES,   // wireframe
+    //GL20.GL_TRIANGLES,
+          GL20.GL_LINES,   // wireframe
     Usage.Position | Usage.ColorPacked | Usage.Normal,
     material
   )
-  for (triangle <- icosphere) {
-//    val c0 = Color.PURPLE
-//    val normal = new Vector3(triangle.centroid).nor()
-//    val i1 = builder.vertex(triangle.points.head, normal, c0, null)
-//    val i2 = builder.vertex(triangle.points(1), normal, c0, null)
-//    val i3 = builder.vertex(triangle.points(2), normal, c0, null)
-//    builder.triangle(i1, i2, i3)
+  val c0 = Color.BLUE
+  for (triangles <- icosphere) {
+    for (triangle <- triangles.triangles) {
+      val normal = new Vector3(triangle.centroid).nor()
+      val i1 = builder.vertex(triangle.bounds.head, normal, c0, null)
+      val i2 = builder.vertex(triangle.bounds(1), normal, c0, null)
+      val i3 = builder.vertex(triangle.bounds(2), normal, c0, null)
+      builder.triangle(i1, i2, i3)
+    }
   }
-  new ModelInstance(modelBuilder.end())
+  val instance = new ModelInstance(modelBuilder.end())
+
+  // setup environment
+  val environment = new Environment()
+  environment.set(
+    new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f)
+  )
+  private val directionalLight =
+    new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f)
+  environment.add(directionalLight)
+
+  private val cam = createCamera()
 
 
   /** Called when this screen becomes the current screen. */
@@ -69,7 +87,11 @@ class IcosphereScreen extends UIScreen {
    * @param delta The time in seconds since the last render. */
   def render(delta: Float): Unit = {
     clearWithColor(backgroundColor)
-    stage.draw()
+    modelBatch.begin(cam)
+    modelBatch.render(instance, environment)
+    modelBatch.end()
+
+    //stage.draw()
   }
 
   def resize(width: Int, height: Int): Unit = {
@@ -104,5 +126,21 @@ class IcosphereScreen extends UIScreen {
   def dispose(): Unit = {
 
   }
+
+  def createCamera(): Camera = {
+    new PerspectiveCamera(
+      30,
+      Gdx.graphics.getWidth.toFloat,
+      Gdx.graphics.getHeight.toFloat
+    ) {
+      position.set(0f, 5.0f, 0f)
+      lookAt(0f, 0f, 0f)
+      rotate(Vector3.Y, 180f) // results in up being positive Vector3.Z
+      near = 0.01f
+      far = 300f
+      update(true)
+    }
+  }
+
 
 }
