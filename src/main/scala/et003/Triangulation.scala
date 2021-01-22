@@ -96,9 +96,9 @@ object Triangulation {
     if (depth == 0) {
       Triangle(p1, p2, p3)
     } else {
-      val m1 = stableMidpoint(p1, p2)
-      val m2 = stableMidpoint(p2, p3)
-      val m3 = stableMidpoint(p3, p1)
+      val m1 = stableMidpoint(p1, p2).setLength(1)
+      val m2 = stableMidpoint(p2, p3).setLength(1)
+      val m3 = stableMidpoint(p3, p1).setLength(1)
       Triangles(
         triangulate(depth - 1, p1, m1, m3),
         triangulate(depth - 1, p2, m2, m1),

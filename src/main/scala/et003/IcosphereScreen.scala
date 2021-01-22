@@ -41,7 +41,7 @@ class IcosphereScreen extends UIScreen {
   resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
   Gdx.graphics.setTitle("Engine Test 003")
 
-  val icosphere = Triangulation.triangulateIcoSphere(1)
+  val icosphere = Triangulation.triangulateIcoSphere(4)
   print(icosphere.length)
 
   private val modelBuilder = new ModelBuilder()
@@ -54,7 +54,7 @@ class IcosphereScreen extends UIScreen {
     Usage.Position | Usage.ColorPacked | Usage.Normal,
     material
   )
-  val c0 = Color.BLUE
+  val c0 = Color.PURPLE
   for (triangles <- icosphere) {
     for (triangle <- triangles.triangles) {
       val normal = new Vector3(triangle.centroid).nor()
@@ -87,6 +87,7 @@ class IcosphereScreen extends UIScreen {
    * @param delta The time in seconds since the last render. */
   def render(delta: Float): Unit = {
     clearWithColor(backgroundColor)
+    instance.transform.rotate(Vector3.Z, 3f * delta)
     modelBatch.begin(cam)
     modelBatch.render(instance, environment)
     modelBatch.end()
