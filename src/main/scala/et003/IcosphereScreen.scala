@@ -1,6 +1,6 @@
 package et003
 
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.graphics.{Camera, Color, GL20, PerspectiveCamera}
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -41,7 +41,7 @@ class IcosphereScreen extends UIScreen {
   resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
   Gdx.graphics.setTitle("Engine Test 003")
 
-  val icosphere = Triangulation.triangulateIcoSphere(4)
+  val icosphere = Triangulation.triangulateIcoSphere(5)
   print(icosphere.length)
 
   private val modelBuilder = new ModelBuilder()
@@ -77,9 +77,16 @@ class IcosphereScreen extends UIScreen {
 
   private val cam = createCamera()
 
+  private val sphericalController =
+    new SphericalCameraController(cam, new Vector3(0, 0, 0))
+
+  private val multiplexer = new InputMultiplexer()
+  multiplexer.addProcessor(sphericalController)
+
 
   /** Called when this screen becomes the current screen. */
   def show(): Unit = {
+    Gdx.input.setInputProcessor(multiplexer)
   }
 
   /** Called when the screen should render itself.
@@ -87,12 +94,11 @@ class IcosphereScreen extends UIScreen {
    * @param delta The time in seconds since the last render. */
   def render(delta: Float): Unit = {
     clearWithColor(backgroundColor)
+    sphericalController.update(delta)
     instance.transform.rotate(Vector3.Z, 3f * delta)
     modelBatch.begin(cam)
     modelBatch.render(instance, environment)
     modelBatch.end()
-
-    //stage.draw()
   }
 
   def resize(width: Int, height: Int): Unit = {
