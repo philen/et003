@@ -7,9 +7,9 @@ import com.badlogic.gdx.math.Vector3
 
 case class CameraConfig(
                          center: Vector3 = new Vector3(0, 0, 0),
-                         height: Float = 3.0f,
-                         minHeight: Float = 1.05f, // needs to be slightly higher than the highest mountains
-                         maxHeight: Float = 6.0f, // 2.0f is the default for world view
+                         height: Float = 5.0f,
+                         minHeight: Float = 1.05f,
+                         maxHeight: Float = 6.0f,
                          rotateSpeed: Int = 40,
                          rotateUp: Int = Keys.W,
                          rotateDown: Int = Keys.S,
@@ -117,14 +117,12 @@ class SphericalCameraController(camera: Camera,
     camera.position.rotate(axis, delta * verticalSpeed)
 
     if (movingIn) {
-      // Move in 10% the distance to minHeight
-      val half = Math.max((height - config.minHeight) / 10, 0.01f)
+      val half = Math.max((height - config.minHeight) / 30, 0.01f)
       height = Math.max(height - half, config.minHeight)
       camera.position.set(camera.position.sub(focus).setLength(height))
     }
     if (movingOut) {
-      // Move out 10% the distance from minHeight
-      val half = Math.max((height - config.minHeight) / 10, 0.01f)
+      val half = Math.max((height - config.minHeight) / 30, 0.01f)
       height = Math.min(height + half, config.maxHeight)
       camera.position.set(camera.position.sub(focus).setLength(height))
     }
