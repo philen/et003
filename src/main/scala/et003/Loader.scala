@@ -27,7 +27,7 @@ object Loader {
     new Lwjgl3ApplicationConfiguration() {
       setTitle("Engine Test 003")
       setWindowPosition(-1, -1)
-      setWindowedMode(900, 900)
+      setWindowedMode(640, 640)
       setBackBufferConfig(8, 8, 8, 8, 16, 0, 4)
       setHdpiMode(HdpiMode.Pixels)
       setWindowSizeLimits(800, 600, 9999, 9999)

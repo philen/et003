@@ -1,14 +1,18 @@
 package et003
 
+import com.badlogic.gdx.graphics.Pixmap.Format
+import com.badlogic.gdx.graphics.Texture.TextureFilter
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.graphics.{Camera, Color, GL20, PerspectiveCamera}
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
+import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.{Environment, Material, ModelBatch, ModelInstance}
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.{Matrix4, Vector3}
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.{Label, Table}
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -20,6 +24,9 @@ class IcosphereScreen extends UIScreen {
   private val shadowColor = Color.DARK_GRAY
 
   private val modelBatch = new ModelBatch()
+
+  private var fbPixels: FrameBuffer = null
+  private val batch = new SpriteBatch()
 
 
   // Generate FreeType fonts
@@ -41,7 +48,7 @@ class IcosphereScreen extends UIScreen {
   resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
   Gdx.graphics.setTitle("Engine Test 003")
 
-  val icosphere = Triangulation.triangulateIcoSphere(5)
+  val icosphere = Triangulation.triangulateIcoSphere(1)
   print(icosphere.length)
 
   private val modelBuilder = new ModelBuilder()
@@ -49,8 +56,8 @@ class IcosphereScreen extends UIScreen {
   modelBuilder.begin()
   val builder = modelBuilder.part(
     s"icosphere",
-    //GL20.GL_TRIANGLES,
-          GL20.GL_LINES,   // wireframe
+    GL20.GL_TRIANGLES,
+    //GL20.GL_LINES,   // wireframe
     Usage.Position | Usage.ColorPacked | Usage.Normal,
     material
   )
@@ -83,6 +90,7 @@ class IcosphereScreen extends UIScreen {
   private val multiplexer = new InputMultiplexer()
   multiplexer.addProcessor(sphericalController)
 
+  val font = new BitmapFont()
 
   /** Called when this screen becomes the current screen. */
   def show(): Unit = {
@@ -93,12 +101,27 @@ class IcosphereScreen extends UIScreen {
    *
    * @param delta The time in seconds since the last render. */
   def render(delta: Float): Unit = {
+    if (fbPixels == null) {
+      fbPixels = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8, true)
+      val matrix = new Matrix4
+      matrix.setToOrtho2D(0, 0, fbPixels.getWidth, fbPixels.getHeight)
+      batch.setProjectionMatrix(matrix)
+    }
+    fbPixels.begin()
     clearWithColor(backgroundColor)
     sphericalController.update(delta)
-    instance.transform.rotate(Vector3.Z, 3f * delta)
+    instance.transform.rotate(Vector3.Z, 2f * delta)
     modelBatch.begin(cam)
     modelBatch.render(instance, environment)
     modelBatch.end()
+    fbPixels.end()
+    batch.begin()
+    batch.setColor(1f, 1f, 1f, 1f)
+    val t = fbPixels.getColorBufferTexture
+    t.setFilter(TextureFilter.Nearest, TextureFilter.Nearest)
+    batch.draw(t, 0, 0)
+    font.draw(batch, Gdx.graphics.getFramesPerSecond + " fps", 10, 10)
+    batch.end()
   }
 
   def resize(width: Int, height: Int): Unit = {
