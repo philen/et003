@@ -103,10 +103,10 @@ class IcosphereScreen extends UIScreen {
   def render(delta: Float): Unit = {
     if (fbPixels == null) {
       fbPixels = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8, true)
-      val matrix = new Matrix4
-      matrix.setToOrtho2D(0, 0, fbPixels.getWidth, fbPixels.getHeight)
-      batch.setProjectionMatrix(matrix)
     }
+    val matrix = new Matrix4
+    matrix.setToOrtho2D(0, 0, fbPixels.getWidth, fbPixels.getHeight)
+    batch.setProjectionMatrix(matrix)
     fbPixels.begin()
     clearWithColor(backgroundColor)
     sphericalController.update(delta)
@@ -120,6 +120,10 @@ class IcosphereScreen extends UIScreen {
     val t = fbPixels.getColorBufferTexture
     t.setFilter(TextureFilter.Nearest, TextureFilter.Nearest)
     batch.draw(t, 0, 0)
+    batch.end()
+    matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+    batch.setProjectionMatrix(matrix)
+    batch.begin()
     font.draw(batch, Gdx.graphics.getFramesPerSecond + " fps", 10, 10)
     batch.end()
   }
