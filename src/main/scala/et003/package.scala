@@ -43,7 +43,7 @@ package object et003 {
   }
 
   def clearWithColor(c: Color): Unit = {
-    Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8)
+    //Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8)
     Gdx.gl.glClearColor(c.r, c.g, c.b, c.a)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
   }
