@@ -28,7 +28,7 @@ class SphericalCameraController(camera: Camera,
                                 focus: Vector3)
   extends InputProcessor {
 
-  val config = CameraConfig()
+  private val config: CameraConfig = CameraConfig()
 
   private var height = config.height
   private var movingIn = false
@@ -104,7 +104,7 @@ class SphericalCameraController(camera: Camera,
     } else {
       horizontalSpeed = horizontalSpeed * rotationFriction
     }
-    horizontalSpeed = (-maxSpeedRatio) max horizontalSpeed min (maxSpeedRatio)
+    horizontalSpeed = (-maxSpeedRatio) max horizontalSpeed min maxSpeedRatio
     camera.position.rotate(camera.up, delta * horizontalSpeed)
 
     if (verticalAcceleration != 0f) {
@@ -113,7 +113,7 @@ class SphericalCameraController(camera: Camera,
       verticalSpeed = verticalSpeed * rotationFriction
     }
     val axis = new Vector3(camera.position.sub(focus)).crs(camera.up)
-    verticalSpeed = (-maxSpeedRatio) max verticalSpeed min (maxSpeedRatio)
+    verticalSpeed = (-maxSpeedRatio) max verticalSpeed min maxSpeedRatio
     camera.position.rotate(axis, delta * verticalSpeed)
 
     if (movingIn) {
