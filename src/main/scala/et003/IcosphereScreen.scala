@@ -25,7 +25,7 @@ class IcosphereScreen extends UIScreen {
 
   Gdx.graphics.setTitle("Engine Test 003")
 
-  val icosphere = Triangulation.triangulateIcoSphere(1)
+  val icosphere = Triangulation.triangulateIcoSphere(2)
 
   private val modelBuilder = new ModelBuilder()
   private val material = new Material()
@@ -52,10 +52,10 @@ class IcosphereScreen extends UIScreen {
   // setup environment
   val environment = new Environment()
   environment.set(
-    new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f)
+    new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 1f, 0.8f)
   )
   private val directionalLight =
-    new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f)
+    new DirectionalLight().set(0.4f, 0.4f, 0.4f, -1f, -1f, 1f)
   environment.add(directionalLight)
 
   private val cam = createCamera()
