@@ -21,21 +21,21 @@ class IcosphereScreen extends UIScreen {
 
   private var fbPixels: FrameBuffer = null
   private val batch = new SpriteBatch()
-
+  private val pixelSize = 8
+  private val projMatrix = new Matrix4()
 
   Gdx.graphics.setTitle("Engine Test 003")
 
   val icosphere = Triangulation.triangulateIcoSphere(2)
 
   private val modelBuilder = new ModelBuilder()
-  private val material = new Material()
   modelBuilder.begin()
   val builder = modelBuilder.part(
     s"icosphere",
     GL20.GL_TRIANGLES,
     //GL20.GL_LINES,   // wireframe
     Usage.Position | Usage.ColorPacked | Usage.Normal,
-    material
+    new Material()
   )
   val c0 = Color.PURPLE
   for (triangles <- icosphere) {
@@ -71,6 +71,7 @@ class IcosphereScreen extends UIScreen {
 
   /** Called when this screen becomes the current screen. */
   def show(): Unit = {
+    createFrameBuffer()
     Gdx.input.setInputProcessor(multiplexer)
   }
 
@@ -78,12 +79,8 @@ class IcosphereScreen extends UIScreen {
    *
    * @param delta The time in seconds since the last render. */
   def render(delta: Float): Unit = {
-    if (fbPixels == null) {
-      fbPixels = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8, true)
-    }
-    val matrix = new Matrix4
-    matrix.setToOrtho2D(0, 0, fbPixels.getWidth, fbPixels.getHeight)
-    batch.setProjectionMatrix(matrix)
+    projMatrix.setToOrtho2D(0, 0, fbPixels.getWidth, fbPixels.getHeight)
+    batch.setProjectionMatrix(projMatrix)
     fbPixels.begin()
     clearWithColor(backgroundColor)
     sphericalController.update(delta)
@@ -97,18 +94,19 @@ class IcosphereScreen extends UIScreen {
     val t = fbPixels.getColorBufferTexture
     t.setFilter(TextureFilter.Nearest, TextureFilter.Nearest)
     batch.draw(t, 0, 0)
+    font.draw(batch, Gdx.graphics.getFramesPerSecond + " fps", 10, 20)
     batch.end()
-    matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-    batch.setProjectionMatrix(matrix)
+    projMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+    batch.setProjectionMatrix(projMatrix)
     batch.begin()
-    font.draw(batch, Gdx.graphics.getFramesPerSecond + " fps", 10, 10)
+    font.draw(batch, Gdx.graphics.getFramesPerSecond + " fps", 50, 50)
     batch.end()
   }
 
   def resize(width: Int, height: Int): Unit = {
-    fbPixels = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth / 8, Gdx.graphics.getHeight / 8, true)
-    cam.viewportWidth = width.toFloat
-    cam.viewportHeight = height.toFloat
+    createFrameBuffer()
+    cam.viewportWidth = width
+    cam.viewportHeight = height
     cam.update()
   }
 
@@ -143,6 +141,13 @@ class IcosphereScreen extends UIScreen {
       far = 300f
       update(true)
     }
+  }
+
+  def createFrameBuffer(): Unit = {
+    fbPixels = new FrameBuffer(
+      Format.RGBA8888, Gdx.graphics.getWidth / pixelSize,
+      Gdx.graphics.getHeight / pixelSize,
+      true)
   }
 
 
